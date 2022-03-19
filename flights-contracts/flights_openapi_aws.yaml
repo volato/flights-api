@@ -161,8 +161,8 @@ components:
     AddToWaitlistResponse:
       type: object
       properties:
-        waitlistNumber:
-          type: integer
+        waitlistEntry:
+          $ref: "#/components/schemas/Flight"
 
     ErrorResponse:
       required:
