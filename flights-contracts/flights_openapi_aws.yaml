@@ -1,0 +1,197 @@
+openapi: "3.0.1"
+info:
+  title: "vaunt-api"
+  description: "API for retrieving flight legs: ${project.version}"
+  version: "${project.version}"
+paths:
+  /flights:
+    get:
+      description: "Returns a list of flights and the status of the waitlist for this user"
+      operationId: "getFlights"
+      responses:
+        404:
+          description: "404 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        200:
+          description: "200 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/FlightsResponse"
+        400:
+          description: "400 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: "500 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /waitlist:
+    get:
+      description: "Returns the waitlist of this user"
+      responses:
+        404:
+          description: "404 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        200:
+          description: "200 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/FlightsResponse"
+        400:
+          description: "400 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: "500 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /waitlist/{flightId}:
+    parameters:
+      - name: "flightId"
+        in: path
+        description: flight id used for the waitlist
+        required: true
+        example: "mxn-cun-20-09"
+        schema:
+          type: string
+      - name: "userId"
+        in: header
+        required: true
+        schema:
+          type: string
+    post:
+      description: "Adds a user to the waitlist of the flight specified by flightId"
+      operationId: "addToWaitlist"
+      responses:
+        404:
+          description: "404 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        200:
+          description: "200 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/AddToWaitlistResponse"
+        400:
+          description: "400 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: "500 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+components:
+  schemas:
+    FlightsResponse:
+      type: "object"
+      required:
+        - flights
+      properties:
+        flights:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Flight"
+    Flight:
+      type: object
+      properties:
+        flightId:
+          type: string
+        date:
+          type: integer
+        airportDeparture:
+          $ref: "#/components/schemas/Airport"
+        airportArrival:
+          $ref: "#/components/schemas/Airport"
+        aircraft:
+          $ref: "#/components/schemas/Aircraft"
+        waitlistEntry:
+          $ref: "#/components/schemas/WaitlistEntry"
+    WaitlistEntry:
+      type: object
+      properties:
+        status:
+          type: boolean
+        waitlistNumber:
+          type: integer
+    Airport:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+    Aircraft:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        passengers:
+          type: string
+        pictureUrl:
+          type: string
+    AddToWaitlistResponse:
+      type: object
+      properties:
+        waitlistNumber:
+          type: integer
+
+    ErrorResponse:
+      required:
+        - "code"
+        - "message"
+        - "status"
+      type: "object"
+      properties:
+        code:
+          type: "string"
+          description: "Custom error code"
+        message:
+          type: "string"
+          description: "Description of the error"
+        detail:
+          type: "string"
+          description: "Description detail of the error"
+        status:
+          type: "string"
+          description: "Http response code"
+        apiRequestId:
+          type: "string"
+          description: "The api-gateway request id"
+        lambdaRequestId:
+          type: "string"
+          description: "The lambda request id"
+  securitySchemes:
+    sigv4:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "awsSigv4"
