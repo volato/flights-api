@@ -123,6 +123,8 @@ components:
       properties:
         flightId:
           type: string
+        destinationImage:
+          type: string
         date:
           type: integer
         airportDeparture:
