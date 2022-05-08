@@ -3,18 +3,13 @@ info:
   title: "vaunt-api"
   description: "API for retrieving flight legs: ${project.version}"
   version: "${project.version}"
+
 paths:
   /flights:
     get:
       description: "Returns a list of flights and the status of the waitlist for this user"
       operationId: "getFlights"
       responses:
-        404:
-          description: "404 response"
-          content:
-            application/json; charset=utf-8:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         200:
           description: "200 response"
           content:
@@ -23,6 +18,13 @@ paths:
                 $ref: "#/components/schemas/FlightsResponse"
         400:
           description: "400 response"
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        404:
+          description: "404 response"
           content:
             application/json; charset=utf-8:
               schema:
@@ -168,7 +170,6 @@ components:
       required:
         - "code"
         - "message"
-        - "status"
       type: "object"
       properties:
         code:
